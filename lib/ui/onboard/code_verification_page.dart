@@ -164,7 +164,8 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
     Map<String, dynamic> data = {
       "phone_number": widget.phoneNumber,
     };
-    var request = ApiRequest(url: "users/resend_otp/", data: data);
+    var request =
+        ApiRequest(url: AppResourses.appStrings.resendCodeUrl, data: data);
     setState(() {
       _loading = true;
     });

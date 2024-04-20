@@ -1,7 +1,7 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:simple_toast_message/simple_toast.dart';
 import 'package:speakupp/api/api_exception.dart';
 import 'package:speakupp/api/auth/auth_call.dart';
@@ -33,9 +33,9 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordAgainController =
       TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   bool _loading = false;
-  String _phoneNumber = "";
   final AuthCall authCall = GetIt.instance.get<AuthCall>();
   final UserItemProvider userItemProvider =
       GetIt.instance.get<UserItemProvider>();
@@ -43,6 +43,7 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
       GetIt.instance.get<SharedPreferenceModule>();
   List gender = ["Male", "Female"];
   String genderSelect = "Male";
+  String countryCode = "+233";
 
   @override
   void initState() {
@@ -143,22 +144,36 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: IntlPhoneField(
-                    disableLengthCheck: true,
-                    showDropdownIcon: false,
-                    keyboardType: TextInputType.number,
-                    dropdownTextStyle: AppResourses.appTextStyles
-                        .textStyle(16, fontColor: Colors.white),
-                    style: AppResourses.appTextStyles
-                        .textStyle(16, fontColor: Colors.white),
-                    decoration: AppInputDecorator.outlinedDecoration(
-                        "Phone Number",
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 0, vertical: 0)),
-                    initialCountryCode: 'GH',
-                    onChanged: (phone) {
-                      _phoneNumber = phone.completeNumber;
-                    },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CountryCodePicker(
+                        flagWidth: 24,
+                        padding: EdgeInsets.zero,
+                        onChanged: _countryChanged,
+                        initialSelection: 'GH',
+                        favorite: const ['+233', '+234'],
+                        showCountryOnly: false,
+                        showOnlyCountryWhenClosed: false,
+                        textStyle: AppResourses.appTextStyles
+                            .textStyle(16, fontColor: Colors.white),
+                        alignLeft: false,
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                            autocorrect: false,
+                            maxLines: 1,
+                            controller: _phoneController,
+                            keyboardType: TextInputType.number,
+                            style: AppResourses.appTextStyles
+                                .textStyle(16, fontColor: Colors.white),
+                            decoration: AppInputDecorator.outlinedDecoration(
+                                "Phone Number",
+                                contentPadding:
+                                    const EdgeInsets.only(bottom: 12))),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -360,14 +375,21 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
     );
   }
 
+  void _countryChanged(CountryCode code) {
+    setState(() {
+      countryCode = code.dialCode ?? "";
+    });
+  }
+
   void _startSignUp() {
     String name = _fullNameController.text.trim();
     String pin = _passwordController.text.trim();
     String pinAgain = _passwordAgainController.text.trim();
+    String phoneNumber = _phoneController.text.trim();
 
     if (name.isEmpty ||
         pin.isEmpty ||
-        _phoneNumber.isEmpty ||
+        phoneNumber.isEmpty ||
         genderSelect.isEmpty) {
       SimpleToast.showErrorToast(
           context, "Sign Up", "Enter all fields and proceed");
@@ -382,8 +404,8 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
     _registerAccount({
       "first_name": name.split(" ")[0],
       "last_name": name.split(" ")[1],
-      "phone_number": _phoneNumber,
-      "username": name,
+      "phone_number": countryCode + phoneNumber,
+      "username": countryCode + phoneNumber,
       "birthday": DateFormat("yyyy-MM-dd").format(DateTime.now()),
       "gender": genderSelect.characters.first.toString().toUpperCase(),
       "password": pin,
@@ -403,21 +425,25 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
     }).then((value) {
       _handleAccount(value);
     }).onError((error, stackTrace) {
-      _handleSignInError(error as ApiException);
+      ApiException apiException = error as ApiException;
+      _handleSignInError(apiException);
     });
   }
 
   void _handleSignInError(ApiException exception) {
     AppPopupDialog(buildContext: context)
         .presentDailog(exception.message.toString(), onCompleted: () {
-      if (exception.code == 102) {}
+      if (exception.code == 401) {
+        String phoneNumber = countryCode + _phoneController.text.trim();
+        AppNavigate(context)
+            .navigateWithPush(CodeVerificationPage(phoneNumber: phoneNumber));
+      }
     });
   }
 
   Future<void> _handleAccount(UserItem userItem) async {
     await userItemProvider.insert(userItem);
     preferenceModule.saveUserData(userItem.authToken!);
-
     _startVerificationPage(userItem.phoneNumber ?? "");
   }
 

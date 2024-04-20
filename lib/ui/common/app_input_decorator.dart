@@ -19,8 +19,9 @@ class AppInputDecorator {
       labelStyle: helperTextStyle,
       helperStyle: helperTextStyle,
       contentPadding: contentPadding,
+      floatingLabelAlignment: FloatingLabelAlignment.start,
+      floatingLabelBehavior: FloatingLabelBehavior.never,
       counterText: "",
-      alignLabelWithHint: true,
       filled: true,
       fillColor: Colors.transparent,
       focusedBorder: const UnderlineInputBorder(
@@ -79,37 +80,47 @@ class AppInputDecorator {
       contentPadding: contentPadding,
       suffixIcon: ClipRRect(
         borderRadius: BorderRadius.circular(4),
-        child: InkWell(
-          onTap: () {
+        child: IconButton(
+          onPressed: () {
             actionDone();
           },
-          child: const Icon(
-            LineIcons.search,
+          icon: const Icon(
+            Icons.close,
             size: 16,
+            color: Colors.white,
           ),
+        ),
+      ),
+      prefixIcon: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: const Icon(
+          LineIcons.search,
+          size: 16,
+          color: Colors.white,
         ),
       ),
       counterText: "",
       alignLabelWithHint: true,
       hintStyle: textStyle,
       labelText: hint,
+      floatingLabelBehavior: FloatingLabelBehavior.never,
       labelStyle: helperTextStyle,
       helperStyle: helperTextStyle,
-      enabledBorder: const UnderlineInputBorder(
+      enabledBorder: const OutlineInputBorder(
           borderSide: BorderSide(
         color: Colors.white,
-        width: 0.0,
+        width: 0.5,
       )),
-      focusedBorder: const UnderlineInputBorder(
+      focusedBorder: const OutlineInputBorder(
         borderSide: BorderSide(
-          color: Colors.transparent,
-          width: 0.0,
+          color: Colors.white,
+          width: 0.6,
         ),
       ),
-      border: const UnderlineInputBorder(
+      border: const OutlineInputBorder(
         borderSide: BorderSide(
-          color: Colors.transparent,
-          width: 0.0,
+          color: Colors.white,
+          width: 0.2,
         ),
       ),
     );
@@ -122,6 +133,7 @@ class AppInputDecorator {
       helperStyle: helperTextStyle,
       alignLabelWithHint: true,
       counterText: "",
+      floatingLabelBehavior: FloatingLabelBehavior.never,
       contentPadding: contentPadding,
       suffixIcon: GestureDetector(
         onTap: () => {toggle()},

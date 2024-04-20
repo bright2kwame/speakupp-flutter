@@ -20,7 +20,7 @@ class AppStrings {
   String get updateInterestUrl => "update_user_interest/";
   String get brandsUrl => "get_brands/";
   String get pollsUrl => "polls/";
-  String get trendingPolls => "polls/all_trending_polls/";
+  String get trendingPolls => "timeline/";
   String get paymentCallback => "https://www.speakupp.com/slydepay_callback/";
   String get partnersUrl => "partners/";
   String get timelineUrl => "timeline/";

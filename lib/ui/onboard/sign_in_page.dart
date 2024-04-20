@@ -1,6 +1,6 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:simple_toast_message/simple_toast.dart';
 import 'package:speakupp/api/api_exception.dart';
 import 'package:speakupp/api/auth/auth_call.dart';
@@ -32,7 +32,7 @@ class _SignInScreenPageState extends State<SignInScreenPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
-  String _phoneNumber = "";
+  String countryCode = "+233";
   bool _loading = false;
   final AuthCall authCall = GetIt.instance.get<AuthCall>();
   final UserItemProvider userItemProvider =
@@ -104,22 +104,36 @@ class _SignInScreenPageState extends State<SignInScreenPage> {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: IntlPhoneField(
-                    disableLengthCheck: true,
-                    showDropdownIcon: false,
-                    controller: _phoneController,
-                    dropdownTextStyle: AppResourses.appTextStyles
-                        .textStyle(16, fontColor: Colors.white),
-                    style: AppResourses.appTextStyles
-                        .textStyle(16, fontColor: Colors.white),
-                    decoration: AppInputDecorator.outlinedDecoration(
-                        "Phone Number",
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 0, vertical: 0)),
-                    initialCountryCode: 'GH',
-                    onChanged: (phone) {
-                      _phoneNumber = phone.completeNumber;
-                    },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CountryCodePicker(
+                        flagWidth: 24,
+                        padding: EdgeInsets.zero,
+                        onChanged: _countryChanged,
+                        initialSelection: 'GH',
+                        favorite: const ['+233', '+234'],
+                        showCountryOnly: false,
+                        showOnlyCountryWhenClosed: false,
+                        textStyle: AppResourses.appTextStyles
+                            .textStyle(16, fontColor: Colors.white),
+                        alignLeft: false,
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                            autocorrect: false,
+                            maxLines: 1,
+                            controller: _phoneController,
+                            keyboardType: TextInputType.number,
+                            style: AppResourses.appTextStyles
+                                .textStyle(16, fontColor: Colors.white),
+                            decoration: AppInputDecorator.outlinedDecoration(
+                                "Phone Number",
+                                contentPadding:
+                                    const EdgeInsets.only(bottom: 12))),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -235,20 +249,30 @@ class _SignInScreenPageState extends State<SignInScreenPage> {
     );
   }
 
+  void _countryChanged(CountryCode code) {
+    setState(() {
+      countryCode = code.dialCode ?? "";
+    });
+  }
+
   void _startSigningIn() {
     String password = _passwordController.text.trim();
-    if (_phoneNumber.isEmpty || password.isEmpty) {
+    String phoneNumber = _phoneController.text.trim();
+    String realPhoneNumber = countryCode + phoneNumber;
+    if (realPhoneNumber.isEmpty || password.isEmpty) {
       SimpleToast.showErrorToast(
           context, "Sign In", "Enter phone number and pin to proceed");
       return;
     }
+
     _performLogin({
-      "phone_number": _phoneNumber,
+      "phone_number": realPhoneNumber,
       "password": password,
     });
   }
 
   void _performLogin(Map<String, dynamic> data) {
+    AppUtility.printLogMessage(data, "DATA");
     setState(() {
       _loading = true;
     });
@@ -281,11 +305,14 @@ class _SignInScreenPageState extends State<SignInScreenPage> {
   }
 
   void _startPasswordPage() {
-    if (_phoneNumber.isEmpty) {
+    String phoneNumber = _passwordController.text.trim();
+    String realPhoneNumber = countryCode + phoneNumber;
+
+    if (countryCode.isEmpty || phoneNumber.isEmpty) {
       SimpleToast.showErrorToast(context, "Sign In", "Enter phone number");
       return;
     }
     AppNavigate(context)
-        .navigateWithPush(ResetPinPage(phoneNumber: _phoneNumber));
+        .navigateWithPush(ResetPinPage(phoneNumber: realPhoneNumber));
   }
 }

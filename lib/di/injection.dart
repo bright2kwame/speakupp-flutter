@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:speakupp/api/auth/auth_call.dart';
 import 'package:speakupp/api/auth/auth_call_impl.dart';
 import 'package:speakupp/api/network_module.dart';
+import 'package:speakupp/api/polls/poll_call.dart';
+import 'package:speakupp/api/polls/poll_call_impl.dart';
 import 'package:speakupp/api/request_interceptor.dart';
 import 'package:speakupp/model/user/user_item_provider.dart';
 import 'package:speakupp/model/user/user_item_provider_impl.dart';
@@ -36,4 +38,5 @@ Future<void> init() async {
 
   //api datasource
   sl.registerLazySingleton<AuthCall>(() => AuthCallImpl(sl()));
+  sl.registerLazySingleton<PollCall>(() => PollCallImpl(sl()));
 }

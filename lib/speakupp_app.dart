@@ -15,7 +15,7 @@ class SpeakuppApp extends StatelessWidget {
       title: AppResourses.appStrings.appName,
       theme: AppTheme(context).buildAppTheme(),
       onGenerateRoute: AppRouterConfig.generateRoute,
-      home: users.isEmpty ? SplashScreenPage(users: users) : Container(),
+      home: SplashScreenPage(users: users),
     );
   }
 }

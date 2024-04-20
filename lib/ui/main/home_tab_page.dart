@@ -6,6 +6,8 @@ import 'package:speakupp/common/app_resourses.dart';
 import 'package:speakupp/model/user/user_item.dart';
 import 'package:speakupp/model/user/user_item_provider.dart';
 import 'package:speakupp/ui/common/custom_app_bar.dart';
+import 'package:speakupp/ui/main/poll_company_page.dart';
+import 'package:speakupp/ui/main/profile_page.dart';
 import 'package:speakupp/ui/main/trending_page.dart';
 
 class HomeTabPage extends StatefulWidget {
@@ -28,8 +30,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
           LineIcons.list,
           size: 24,
         ),
-        label: "Trending",
-        tooltip: "Trending"),
+        label: "Timeline",
+        tooltip: "Timeline"),
     BottomNavigationBarItem(
         icon: Icon(
           LineIcons.voteYea,
@@ -37,13 +39,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
         ),
         tooltip: "Polls",
         label: "Polls"),
-    BottomNavigationBarItem(
-        icon: Icon(
-          LineIcons.search,
-          size: 24,
-        ),
-        tooltip: "Search",
-        label: "Search"),
     BottomNavigationBarItem(
         icon: Icon(
           LineIcons.userAlt,
@@ -55,9 +50,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   final List<Widget> _pages = const [
     TrendingPage(),
-    TrendingPage(),
-    TrendingPage(),
-    TrendingPage(),
+    PollCompanyPage(),
+    ProfilePage(),
   ];
 
   _changeTab(int index) {
