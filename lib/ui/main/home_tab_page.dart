@@ -6,6 +6,7 @@ import 'package:speakupp/common/app_resourses.dart';
 import 'package:speakupp/model/user/user_item.dart';
 import 'package:speakupp/model/user/user_item_provider.dart';
 import 'package:speakupp/ui/common/custom_app_bar.dart';
+import 'package:speakupp/ui/main/trending_page.dart';
 
 class HomeTabPage extends StatefulWidget {
   const HomeTabPage({super.key});
@@ -52,11 +53,11 @@ class _HomeTabPageState extends State<HomeTabPage> {
         label: "Profile"),
   ];
 
-  final List<Widget> _pages = [
-    Container(),
-    Container(),
-    Container(),
-    Container(),
+  final List<Widget> _pages = const [
+    TrendingPage(),
+    TrendingPage(),
+    TrendingPage(),
+    TrendingPage(),
   ];
 
   _changeTab(int index) {
