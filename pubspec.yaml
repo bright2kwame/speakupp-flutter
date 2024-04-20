@@ -1,0 +1,72 @@
+name: speakupp
+description: "Be Relevant The phenomenon of the silent majority has been one of the enduring paradoxes in our democracies. Too often, the majority has been powerless to exert any influence on decisions affecting them. The bitter reality is that the majority exists but does not govern. The will of the people is not reflected in our daily experiences partly due to our inability to relay our collective thoughts to our leaders and service providers in real time."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0-282.1.beta <4.0.0"
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.6
+  get_it: ^7.1.3
+  dio: ^5.3.3
+  # data persistence service
+  shared_preferences: ^2.0.6
+  sqflite:
+  path:
+  flutter_svg: ^2.0.10+1
+  google_fonts: ^5.1.0
+  line_icons: ^2.0.0
+  intl: ^0.18.0
+  dotted_border: ^2.1.0
+  simple_toast_message: ^0.0.5
+  #image and permission
+  image_picker: ^1.0.7
+  #location information
+  geolocator: ^11.0.0
+  url_launcher: ^6.1.14
+  share_plus: ^2.0.0
+  intl_phone_field: ^3.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^3.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/SpeakUpBg.png
+    - assets/images/TutorialOne.png
+    - assets/images/TutorialTwo.png
+    - assets/images/TutorialThree.png
+    - assets/images/MainLogo.png
+    - assets/images/HeaderLogo.png
