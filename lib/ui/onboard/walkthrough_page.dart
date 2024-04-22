@@ -79,32 +79,35 @@ class _WalkthroughPageState extends State<WalkthroughPage> {
           child: Image.asset(AppResourses.appImages.headerLogo),
         ),
         Expanded(
-            child: PageView.builder(
-                physics: const BouncingScrollPhysics(),
-                controller: _controller,
-                onPageChanged: (value) => setState(() => _currentPage = value),
-                itemCount: _content.length,
-                itemBuilder: (context, i) {
-                  return Container(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Padding(
+          child: PageView.builder(
+              physics: const BouncingScrollPhysics(),
+              controller: _controller,
+              onPageChanged: (value) => setState(() => _currentPage = value),
+              itemCount: _content.length,
+              itemBuilder: (context, i) {
+                return Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Padding(
                             padding: const EdgeInsets.all(32),
                             child: Image.asset(_images[_currentPage]),
                           ),
-                          Text(
-                            _content[_currentPage],
-                            textAlign: TextAlign.center,
-                            style: AppResourses.appTextStyles.textStyle(24,
-                                fontColor: Colors.white,
-                                weight: FontWeight.normal),
-                          )
-                        ],
-                      ));
-                })),
+                        ),
+                        Text(
+                          _content[_currentPage],
+                          textAlign: TextAlign.center,
+                          style: AppResourses.appTextStyles.textStyle(24,
+                              fontColor: Colors.white,
+                              weight: FontWeight.normal),
+                        )
+                      ],
+                    ));
+              }),
+        ),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
           child: Row(

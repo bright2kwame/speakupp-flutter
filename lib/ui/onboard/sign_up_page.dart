@@ -376,9 +376,7 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
   }
 
   void _countryChanged(CountryCode code) {
-    setState(() {
-      countryCode = code.dialCode ?? "";
-    });
+    countryCode = code.dialCode ?? "";
   }
 
   void _startSignUp() {

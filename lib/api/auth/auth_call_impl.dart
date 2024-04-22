@@ -64,7 +64,7 @@ class AuthCallImpl extends AuthCall {
     Response response;
     try {
       response = await dio.post(request.url, data: request.data);
-      return _handleDetailResult(response);
+      return _handleMessageResult(response);
     } on DioException catch (e) {
       throw _handleException(e);
     }
@@ -72,14 +72,24 @@ class AuthCallImpl extends AuthCall {
 
   @override
   Future<DetailItem> startPhoneVerification(ApiRequest request) async {
-    final response = await dio.post(request.url, data: request.data);
-    return _handleMessageResult(response);
+    Response response;
+    try {
+      response = await dio.post(request.url, data: request.data);
+      return _handleMessageResult(response);
+    } on DioException catch (e) {
+      throw _handleException(e);
+    }
   }
 
   @override
-  Future<DetailItem> verifyPhone(ApiRequest request) async {
-    final response = await dio.post(request.url, data: request.data);
-    return _handleMessageResult(response);
+  Future<DetailItem> changePassword(ApiRequest request) async {
+    Response response;
+    try {
+      response = await dio.post(request.url, data: request.data);
+      return _handleMessageResult(response);
+    } on DioException catch (e) {
+      throw _handleException(e);
+    }
   }
 
   @override
@@ -87,8 +97,13 @@ class AuthCallImpl extends AuthCall {
     FormData formData = FormData.fromMap({
       "file": await MultipartFile.fromFile(request.data["file"]),
     });
-    final response = await dio.post(request.url, data: formData);
-    return _handleFileResult(response);
+    Response response;
+    try {
+      response = await dio.post(request.url, data: formData);
+      return _handleFileResult(response);
+    } on DioException catch (e) {
+      throw _handleException(e);
+    }
   }
 
   @override
@@ -96,58 +111,56 @@ class AuthCallImpl extends AuthCall {
     FormData formData = FormData.fromMap({
       "file": await MultipartFile.fromFile(request.data["file"]),
     });
-    final response = await dio.post(request.url, data: formData);
-    return _handleFileResult(response);
+    Response response;
+    try {
+      response = await dio.post(request.url, data: formData);
+      return _handleFileResult(response);
+    } on DioException catch (e) {
+      throw _handleException(e);
+    }
   }
 
   @override
   Future<DetailItem> resetPassword(ApiRequest request) async {
-    final response = await dio.post(request.url, data: request.data);
-    return _handleDetailResult(response);
+    Response response;
+    try {
+      response = await dio.post(request.url, data: request.data);
+      return _handleMessageResult(response);
+    } on DioException catch (e) {
+      throw _handleException(e);
+    }
   }
 
   @override
   Future<DetailItem> initResetPassword(ApiRequest request) async {
-    final response = await dio.post(request.url, data: request.data);
-    return _handleDetailResult(response);
-  }
-
-  DetailItem _handleMessageResult(Response<dynamic> response) {
+    Response response;
     try {
-      String code =
-          ReponseDataParser.getJsonKey(response.data, "response_code");
-      if (code == "100") {
-        return DetailItem.fromJson(response.data);
-      } else {
-        throw ApiException(
-            code: int.parse(code),
-            message: ReponseDataParser.getJsonKey(response.data, "detail"));
-      }
+      response = await dio.post(request.url, data: request.data);
+      return _handleMessageResult(response);
     } on DioException catch (e) {
-      throw ApiException(
-          code: e.response?.statusCode ?? 0,
-          message: e.response?.statusMessage ?? "");
+      throw _handleException(e);
     }
   }
 
-  DetailItem _handleDetailResult(Response<dynamic> response) {
-    String code = ReponseDataParser.getJsonKey(response.data, "response_code");
-    if (code == "100") {
-      return DetailItem.fromJson(response.data);
+  DetailItem _handleMessageResult(Response<dynamic> response) {
+    AppUtility.printLogMessage(response.data, "RESULT");
+    String code = ReponseDataParser.getJsonKey(response.data, "status");
+    if (code == ApiResultStatus.success.name) {
+      return DetailItem.fromMessageJson(response.data);
     } else {
       throw ApiException(
-          code: int.parse(code),
+          code: 300,
           message: ReponseDataParser.getJsonKey(response.data, "detail"));
     }
   }
 
   DetailItem _handleFileResult(Response<dynamic> response) {
     String code = ReponseDataParser.getJsonKey(response.data, "response_code");
-    if (code == "100") {
+    if (code == ApiResultStatus.success.name) {
       return DetailItem.fromFileJson(response.data);
     } else {
       throw ApiException(
-          code: int.parse(code),
+          code: 300,
           message: ReponseDataParser.getJsonKey(response.data, "detail"));
     }
   }
@@ -166,6 +179,7 @@ class AuthCallImpl extends AuthCall {
   }
 
   ApiException _handleException(DioException e) {
+    AppUtility.printLogMessage(e.response?.statusCode ?? 0, "FAILED_CODE");
     String detail = ReponseDataParser.getJsonKey(e.response?.data, "detail")
         .toString()
         .trim();
@@ -174,6 +188,10 @@ class AuthCallImpl extends AuthCall {
     }
     if (detail.isEmpty) {
       detail = ReponseDataParser.getJsonKey(e.response?.data, "results");
+    }
+    if (detail.isEmpty) {
+      detail =
+          "Sorry, Unable to establish connection with the server. Try again later";
     }
     return ApiException(code: e.response?.statusCode ?? 0, message: detail);
   }

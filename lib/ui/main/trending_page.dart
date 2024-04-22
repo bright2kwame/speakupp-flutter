@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:speakupp/api/polls/poll_call.dart';
 import 'package:speakupp/common/app_enums.dart';
@@ -25,12 +26,37 @@ class _TrendingPageState extends State<TrendingPage> {
       GetIt.instance.get<UserItemProvider>();
   List<PollItem> items = [];
   String nextUrl = "";
+  Timer? _searchTimer;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(_startSearch);
     WidgetsBinding.instance.addPostFrameCallback((_) => _uiReady(context));
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _searchTimer?.cancel();
+    super.dispose();
+  }
+
+  //MARK: start searching here
+  void _startSearch() {
+    const Duration searchDelay = Duration(seconds: 2);
+    _searchTimer?.cancel();
+    _searchTimer = Timer(searchDelay, () {
+      String text = _searchController.text.trim();
+      if (text.isNotEmpty) {
+        items.clear;
+        Map<String, dynamic> dataParams = {"search_text": text};
+        var request = ApiRequest(
+            url: AppResourses.appStrings.pollSearchUrl, data: dataParams);
+        _searchData(request);
+      }
+    });
   }
 
   void _uiReady(BuildContext buildContext) {
@@ -90,7 +116,8 @@ class _TrendingPageState extends State<TrendingPage> {
         scrollDirection: Axis.vertical,
         itemBuilder: (BuildContext context, int position) {
           PollItem pollItem = items[position];
-          return PollItemView().single(pollItem, (PollAction action) {});
+          return PollItemView(buildContext: context)
+              .single(pollItem, (PollAction action) {});
         },
         separatorBuilder: (BuildContext context, int position) {
           return const SizedBox(
@@ -98,6 +125,22 @@ class _TrendingPageState extends State<TrendingPage> {
           );
         },
         itemCount: items.length);
+  }
+
+  void _searchData(ApiRequest request) {
+    setState(() {
+      _loading = true;
+    });
+    pollCall.searchPolls(request).whenComplete(() {
+      setState(() {
+        _loading = false;
+      });
+    }).then((value) {
+      setState(() {
+        items.addAll(value.items);
+        nextUrl = value.nextUrl ?? "";
+      });
+    }).onError((error, stackTrace) {});
   }
 
   void _fetchData(ApiRequest request) {

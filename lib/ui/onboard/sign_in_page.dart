@@ -250,16 +250,15 @@ class _SignInScreenPageState extends State<SignInScreenPage> {
   }
 
   void _countryChanged(CountryCode code) {
-    setState(() {
-      countryCode = code.dialCode ?? "";
-    });
+    countryCode = code.dialCode ?? "";
   }
 
   void _startSigningIn() {
     String password = _passwordController.text.trim();
     String phoneNumber = _phoneController.text.trim();
-    String realPhoneNumber = countryCode + phoneNumber;
-    if (realPhoneNumber.isEmpty || password.isEmpty) {
+    String realPhoneNumber = countryCode + _phoneController.text.trim();
+
+    if (phoneNumber.isEmpty || password.isEmpty) {
       SimpleToast.showErrorToast(
           context, "Sign In", "Enter phone number and pin to proceed");
       return;
@@ -305,14 +304,13 @@ class _SignInScreenPageState extends State<SignInScreenPage> {
   }
 
   void _startPasswordPage() {
-    String phoneNumber = _passwordController.text.trim();
-    String realPhoneNumber = countryCode + phoneNumber;
+    String phoneNumber = _phoneController.text.trim();
 
-    if (countryCode.isEmpty || phoneNumber.isEmpty) {
+    if (phoneNumber.isEmpty) {
       SimpleToast.showErrorToast(context, "Sign In", "Enter phone number");
       return;
     }
     AppNavigate(context)
-        .navigateWithPush(ResetPinPage(phoneNumber: realPhoneNumber));
+        .navigateWithPush(ResetPinPage(phoneNumber: countryCode + phoneNumber));
   }
 }

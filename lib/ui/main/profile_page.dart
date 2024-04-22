@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:simple_toast_message/simple_toast.dart';
+import 'package:speakupp/api/api_exception.dart';
+import 'package:speakupp/api/auth/auth_call.dart';
 import 'package:speakupp/common/app_navigate.dart';
 import 'package:speakupp/common/app_resourses.dart';
+import 'package:speakupp/common/app_utility.dart';
+import 'package:speakupp/model/common/api_request.dart';
 import 'package:speakupp/model/user/user_item.dart';
 import 'package:speakupp/model/user/user_item_provider.dart';
 import 'package:speakupp/persistence/shared_preference_module.dart';
 import 'package:speakupp/ui/common/app_popup_dialog.dart';
+import 'package:speakupp/ui/common/app_progress_indicator.dart';
 import 'package:speakupp/ui/onboard/splash_screen_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -22,12 +28,13 @@ class _ProfilePageState extends State<ProfilePage> {
   late UserItem? userItem;
   final SharedPreferenceModule preferenceModule =
       GetIt.instance.get<SharedPreferenceModule>();
+  final AuthCall authCall = GetIt.instance.get<AuthCall>();
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
     userItem = null;
-    super.initState();
     userItemProvider.list().then((value) {
       setState(() {
         userItem = value.first;
@@ -40,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return userItem == null ? Container() : _mainView();
+    return _mainView();
   }
 
   Widget _mainView() {
@@ -49,6 +56,8 @@ class _ProfilePageState extends State<ProfilePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          AppProgressIndicator().inderminateProgress(_loading,
+              color: AppResourses.appColors.primaryColor),
           _profileView(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -60,9 +69,13 @@ class _ProfilePageState extends State<ProfilePage> {
           _profileItem("Personal information", LineIcons.userAlt, onTap: () {
             _gotoProfilePage();
           }),
-          _profileItem("My Bookings", LineIcons.bookmark, onTap: () {}),
-          _profileItem("Transactions", LineIcons.wallet, onTap: () {}),
-          _profileItem("Investments", LineIcons.thumbsUpAlt),
+          _profileItem("Change PIN", LineIcons.userSecret, onTap: () {
+            _gotoPinChangePage();
+          }),
+          _profileItem("Share SpeakUpp", LineIcons.shareSquare, onTap: () {
+            AppUtility.startSharingContent(
+                "I use SpeakUpp to cast vote and rate things. Join me here: https://www.speakupp.com/");
+          }),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
@@ -70,9 +83,14 @@ class _ProfilePageState extends State<ProfilePage> {
               style: AppResourses.appTextStyles.textStyle(20),
             ),
           ),
-          _profileItem("Visit the help center", LineIcons.link),
-          _profileItem("How Hanfie works", LineIcons.wiredNetwork),
-          _profileItem("Give feedback", LineIcons.heart),
+          _profileItem("Visit the help center", LineIcons.link, onTap: () {
+            AppUtility.startlaunchUrl(
+                Uri.parse("https://www.speakupp.com/contact/"));
+          }),
+          _profileItem("Give feedback", LineIcons.heart, onTap: () {
+            AppUtility.startlaunchUrl(
+                Uri.parse("https://www.speakupp.com/contact/"));
+          }),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
@@ -101,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
   //logout out of acccount
   void _logoutAccount() {
     AppPopupDialog(buildContext: context).presentDailog(
-        "You may have to provide your email and password next time you return to login into HANFIE.",
+        "You may have to provide your phone number and pin next time you return to login into SpeakUpp.",
         title: "Log out of SpeakUpp", onCompleted: () {
       preferenceModule.saveUserData("");
       userItemProvider.deleteAll().then((value) {
@@ -110,40 +128,6 @@ class _ProfilePageState extends State<ProfilePage> {
         ));
       });
     });
-  }
-
-  Widget _profileSubItem(String title, String subTitle, IconData iconData,
-      {Function? onTap}) {
-    return Column(
-      children: [
-        ListTile(
-          onTap: onTap != null ? onTap() : null,
-          leading: Icon(
-            iconData,
-            color: Colors.black,
-          ),
-          title: Text(
-            title,
-            style: AppResourses.appTextStyles.textStyle(12),
-          ),
-          subtitle: Text(
-            subTitle,
-            style: AppResourses.appTextStyles.textStyle(16),
-          ),
-          trailing: const Icon(
-            Icons.arrow_right,
-            color: Colors.black,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 2, left: 12, right: 12),
-          child: Divider(
-            height: 2,
-            color: Colors.grey.withAlpha(100),
-          ),
-        )
-      ],
-    );
   }
 
   Widget _profileItem(String title, IconData iconData, {Function? onTap}) {
@@ -178,7 +162,63 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _gotoProfilePage() {
-    AppNavigate(context).navigateWithPush(Container());
+    AppPopupDialog(buildContext: context).presentProfileInputView(
+        firstName: userItem?.firstName,
+        lastName: userItem?.lastName,
+        actionTaken: (String result) {
+          _updateData(ApiRequest(
+              url: AppResourses.appStrings.profileUrl,
+              data: {
+                "first_name": result.split("@")[0],
+                "last_name": result.split("@")[1]
+              }));
+        });
+  }
+
+  void _gotoPinChangePage() {
+    AppPopupDialog(buildContext: context).presentPasswordInputView(
+        actionTaken: (String result) {
+      _changePassword(ApiRequest(
+          url: AppResourses.appStrings.completeResetUrl,
+          data: {"phone_number": userItem?.phoneNumber, "password": result}));
+    });
+  }
+
+  void _changePassword(ApiRequest request) {
+    setState(() {
+      _loading = true;
+    });
+    authCall.changePassword(request).whenComplete(() {
+      setState(() {
+        _loading = false;
+      });
+    }).then((value) {
+      SimpleToast.showSuccessToast(
+          context, "SpeakUpp", "PIN changed successfully");
+    }).onError((error, stackTrace) {
+      SimpleToast.showErrorToast(
+          context, "SpeakUpp", (error as ApiException).message);
+    });
+  }
+
+  void _updateData(ApiRequest request) {
+    setState(() {
+      _loading = true;
+    });
+    authCall.updateUser(request).whenComplete(() {
+      setState(() {
+        _loading = false;
+      });
+    }).then((value) {
+      setState(() {
+        userItem = value;
+      });
+      SimpleToast.showSuccessToast(
+          context, "SpeakUpp", "Profile update successfully");
+    }).onError((error, stackTrace) {
+      SimpleToast.showErrorToast(
+          context, "SpeakUpp", (error as ApiException).message);
+    });
   }
 
   Widget _profileView() {
@@ -195,17 +235,28 @@ class _ProfilePageState extends State<ProfilePage> {
           )),
           child: Center(
             child: ClipOval(
-              child: userItem != null
-                  ? Image.network(userItem!.avatar!)
-                  : Image.asset(AppResourses.appImages.userAvatar),
-            ),
+                child: (userItem == null)
+                    ? Image.asset(
+                        AppResourses.appImages.userAvatar,
+                        height: 50,
+                        width: 50,
+                      )
+                    : Center(
+                        child: ClipOval(
+                          child: Text(
+                            userItem!.firstName!.characters.first,
+                            style: AppResourses.appTextStyles
+                                .textStyle(24, fontColor: Colors.white),
+                          ),
+                        ),
+                      )),
           ),
         ),
       ),
       title: Text(
           userItem != null
               ? "${userItem!.firstName} ${userItem!.lastName}"
-              : "",
+              : "N/A",
           style: AppResourses.appTextStyles.textStyle(16)),
     );
   }

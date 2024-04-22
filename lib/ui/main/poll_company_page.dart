@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:speakupp/api/polls/poll_call.dart';
 import 'package:speakupp/common/app_enums.dart';
+import 'package:speakupp/common/app_navigate.dart';
 import 'package:speakupp/common/app_resourses.dart';
 import 'package:speakupp/model/common/api_request.dart';
 import 'package:speakupp/model/poll/poll_company_item.dart';
 import 'package:speakupp/model/user/user_item_provider.dart';
 import 'package:speakupp/ui/common/app_progress_indicator.dart';
+import 'package:speakupp/ui/polls/corporate_detail_page.dart';
 import 'package:speakupp/ui/polls/poll_item_view.dart';
 
 class PollCompanyPage extends StatefulWidget {
@@ -64,7 +66,13 @@ class _PollCompanyPageState extends State<PollCompanyPage> {
         scrollDirection: Axis.vertical,
         itemBuilder: (BuildContext context, int position) {
           PollCompanyItem pollItem = items[position];
-          return PollItemView().coporate(pollItem, (PollAction action) {});
+          return PollItemView(buildContext: context).coporate(pollItem,
+              (PollAction action) {
+            if (action == PollAction.detail) {
+              AppNavigate(context)
+                  .navigateWithPush(CorporateDetailPage(id: pollItem.id));
+            }
+          });
         },
         separatorBuilder: (BuildContext context, int position) {
           return const SizedBox(

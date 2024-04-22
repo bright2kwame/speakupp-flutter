@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:speakupp/common/app_resourses.dart';
 
 class AppInputDecorator {
   static TextStyle textStyle = GoogleFonts.nunito(
@@ -11,13 +12,42 @@ class AppInputDecorator {
 
   static EdgeInsets contentPadding = const EdgeInsets.all(12.0);
 
-  static InputDecoration outlinedDecoration(String hint,
-      {EdgeInsets? contentPadding = const EdgeInsets.all(12.0)}) {
+  static InputDecoration underlineDecoration(String hint,
+      {EdgeInsets? contentPadding = const EdgeInsets.all(12.0),
+      TextStyle? textStyle}) {
     return InputDecoration(
       hintStyle: textStyle,
       labelText: hint,
-      labelStyle: helperTextStyle,
-      helperStyle: helperTextStyle,
+      labelStyle: textStyle ?? helperTextStyle,
+      helperStyle: textStyle ?? helperTextStyle,
+      contentPadding: contentPadding,
+      floatingLabelAlignment: FloatingLabelAlignment.center,
+      counterText: "",
+      filled: true,
+      fillColor: Colors.transparent,
+      focusedBorder: const UnderlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+        borderSide: BorderSide(color: Colors.black, width: 1.0),
+      ),
+      enabledBorder: const UnderlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+        borderSide: BorderSide(color: Colors.black, width: 1.5),
+      ),
+      border: const UnderlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+        borderSide: BorderSide(color: Colors.black, width: 1.0),
+      ),
+    );
+  }
+
+  static InputDecoration outlinedDecoration(String hint,
+      {EdgeInsets? contentPadding = const EdgeInsets.all(12.0),
+      TextStyle? textStyle}) {
+    return InputDecoration(
+      hintStyle: textStyle,
+      labelText: hint,
+      labelStyle: textStyle ?? helperTextStyle,
+      helperStyle: textStyle ?? helperTextStyle,
       contentPadding: contentPadding,
       floatingLabelAlignment: FloatingLabelAlignment.start,
       floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -122,6 +152,38 @@ class AppInputDecorator {
           color: Colors.white,
           width: 0.2,
         ),
+      ),
+    );
+  }
+
+  static InputDecoration linePasswordInputDecoration(
+      String hint, Function toggle, bool showPassword) {
+    return InputDecoration(
+      labelStyle: AppResourses.appTextStyles.textStyle(16),
+      helperStyle: AppResourses.appTextStyles.textStyle(16),
+      alignLabelWithHint: true,
+      counterText: "",
+      contentPadding: contentPadding,
+      suffixIcon: GestureDetector(
+        onTap: () => {toggle()},
+        child: Icon(
+          showPassword ? LineIcons.eyeSlash : LineIcons.eye,
+          color: Colors.white,
+        ),
+      ),
+      hintStyle: textStyle,
+      labelText: hint,
+      focusedBorder: const UnderlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+        borderSide: BorderSide(color: Colors.black, width: 1.5),
+      ),
+      enabledBorder: const UnderlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+        borderSide: BorderSide(color: Colors.black, width: 1.5),
+      ),
+      border: const UnderlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(0)),
+        borderSide: BorderSide(color: Colors.black, width: 1),
       ),
     );
   }

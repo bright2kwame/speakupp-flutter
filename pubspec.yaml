@@ -37,6 +37,7 @@ dependencies:
   url_launcher: ^6.1.14
   share_plus: ^2.0.0
   country_code_picker: ^3.0.0
+  webview_flutter: ^2.0.9
 
 dev_dependencies:
   flutter_test:
@@ -68,3 +69,4 @@ flutter:
     - assets/images/MainLogo.png
     - assets/images/HeaderLogo.png
     - assets/images/UserIcon.png
+    - assets/images/Correct.png

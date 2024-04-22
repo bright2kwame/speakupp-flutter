@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:speakupp/common/app_enums.dart';
+import 'package:speakupp/common/app_navigate.dart';
 import 'package:speakupp/common/app_resourses.dart';
 import 'package:speakupp/model/poll/poll_company_item.dart';
 import 'package:speakupp/model/poll/poll_item.dart';
 import 'package:speakupp/model/poll/poll_option_item.dart';
+import 'package:speakupp/ui/polls/buy_vote_page.dart';
+import 'package:speakupp/ui/util/image_preview_page.dart';
 
 class PollItemView {
+  BuildContext buildContext;
+  PollItemView({required this.buildContext});
+
   //MARK: display each poll item
   Widget single(PollItem item, Function(PollAction) actionTaken) {
     return Container(
@@ -16,13 +22,13 @@ class PollItemView {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(4),
             child: ListTile(
               trailing: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
                 color: Colors.red,
                 child: Text(
-                  item.pollType.toUpperCase(),
+                  item.pollType.toUpperCase().replaceAll("_", " "),
                   style: AppResourses.appTextStyles
                       .textStyle(10, fontColor: Colors.white),
                 ),
@@ -94,7 +100,7 @@ class PollItemView {
 
   Widget _unVotedPollOption(PollItem item) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: item.pollOptions.isEmpty
           ? Container()
           : item.pollOptions.first.imageUlr!.isEmpty
@@ -112,7 +118,7 @@ class PollItemView {
         scrollDirection: Axis.vertical,
         itemBuilder: (BuildContext context, int position) {
           PollOptionItem optionItem = item.pollOptions[position];
-          return Text(optionItem.choiceText);
+          return _singleUnVotedPollOption(item, optionItem);
         },
         separatorBuilder: (BuildContext context, int position) {
           return const SizedBox(
@@ -122,27 +128,147 @@ class PollItemView {
         itemCount: item.pollOptions.length);
   }
 
-//MARK: vote for poll with image
+  Widget _singleUnVotedPollOption(PollItem pollItem, PollOptionItem item) {
+    return GestureDetector(
+      onTap: () {
+        _startVotingProcess(pollItem, item);
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        decoration: BoxDecoration(
+            color: Colors.transparent, border: Border.all(color: Colors.grey)),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(1.0),
+              child: Radio(
+                  value: "value",
+                  groupValue: "groupValue",
+                  onChanged: (String? check) {}),
+            ),
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(item.choiceText),
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _startVotingProcess(PollItem item, PollOptionItem option) {
+    AppNavigate(buildContext).navigateWithPush(BuyVotePage(
+      pollItem: item,
+      pollOptionItem: option,
+    ));
+  }
+
+  //MARK: vote for poll with image
   Widget _unVotedPollImageOption(PollItem item) {
-    return ListView.separated(
-        shrinkWrap: true,
-        physics: const BouncingScrollPhysics(),
-        primary: false,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (BuildContext context, int position) {
-          PollOptionItem _ = item.pollOptions[position];
-          return Container(
-            height: 200,
-            width: 200,
-            color: Colors.green,
-          );
-        },
-        separatorBuilder: (BuildContext context, int position) {
-          return const SizedBox(
-            height: 2,
-          );
-        },
-        itemCount: item.pollOptions.length);
+    return SizedBox(
+      height: 200,
+      child: ListView.separated(
+          shrinkWrap: true,
+          physics: const BouncingScrollPhysics(),
+          primary: false,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (BuildContext context, int position) {
+            PollOptionItem option = item.pollOptions[position];
+            return GestureDetector(
+              onTap: () {
+                _startVotingProcess(item, option);
+              },
+              child: Container(
+                height: 200,
+                width: 200,
+                margin: const EdgeInsets.only(right: 4),
+                child: Stack(
+                  children: [
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      top: 0,
+                      child: Image.network(
+                        option.imageUlr!,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 4),
+                        color: Colors.black,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              LineIcons.users,
+                              color: Colors.white,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Text(
+                                "${option.numOfVotes}",
+                                style: AppResourses.appTextStyles
+                                    .textStyle(12, fontColor: Colors.white),
+                              ),
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Text(
+                                  option.choiceText,
+                                  textAlign: TextAlign.start,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppResourses.appTextStyles
+                                      .textStyle(12, fontColor: Colors.white),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                        top: 0,
+                        left: 0,
+                        child: Container(
+                          margin: const EdgeInsets.all(4.0),
+                          color: Colors.black,
+                          child: GestureDetector(
+                              onTap: () {
+                                _startImagePreview(option.imageUlr ?? "");
+                              },
+                              child: const Icon(
+                                LineIcons.expand,
+                                size: 32,
+                                color: Colors.white,
+                              )),
+                        ))
+                  ],
+                ),
+              ),
+            );
+          },
+          separatorBuilder: (BuildContext context, int position) {
+            return const SizedBox(
+              height: 2,
+            );
+          },
+          itemCount: item.pollOptions.length),
+    );
+  }
+
+  void _startImagePreview(String url) {
+    AppNavigate(buildContext).navigateWithPush(ImagePreviewPage(
+      url: url,
+    ));
   }
 
   Widget _votedPollOption(PollItem item) {
@@ -159,7 +285,7 @@ class PollItemView {
           },
           separatorBuilder: (BuildContext context, int position) {
             return const SizedBox(
-              height: 2,
+              height: 4,
             );
           },
           itemCount: item.pollOptions.length),
@@ -167,27 +293,55 @@ class PollItemView {
   }
 
   Widget _singleVotedPollOption(String selectedChoice, PollOptionItem item) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-          color: item.id == selectedChoice
-              ? AppResourses.appColors.primaryColor
-              : Colors.transparent,
-          border: Border.all(
-              color: item.id == selectedChoice
-                  ? AppResourses.appColors.primaryColor
-                  : Colors.grey)),
-      child: Row(
+    return SizedBox(
+      height: 44,
+      child: Stack(
         children: [
-          Expanded(
-              child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Text(item.choiceText),
-          )),
-          Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: Text("${item.resultPercent.toString()}%"),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: 0,
+            child: LinearProgressIndicator(
+                value: item.resultPercent! / 100,
+                backgroundColor: Colors.white,
+                color: AppResourses.appColors.primaryColor),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: 0,
+            child: Container(
+              height: 44,
+              margin: const EdgeInsets.symmetric(vertical: 0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                  border: Border.all(
+                      color: item.id == selectedChoice
+                          ? AppResourses.appColors.primaryColor
+                          : Colors.grey)),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(item.choiceText),
+                  )),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text("${item.resultPercent!.toStringAsFixed(2)}%"),
+                  ),
+                  item.id == selectedChoice
+                      ? Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child:
+                              Image.asset(AppResourses.appImages.correctSign),
+                        )
+                      : Container()
+                ],
+              ),
+            ),
           )
         ],
       ),
@@ -197,7 +351,7 @@ class PollItemView {
   Widget _questionWithImage(PollItem item) {
     return Container(
       height: 308,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Stack(
         children: [
           Positioned(
@@ -230,7 +384,7 @@ class PollItemView {
 
   Widget _questionWithNoImage(PollItem item) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,6 +449,10 @@ class PollItemView {
 
   Widget coporate(PollCompanyItem item, Function(PollAction) actionTaken) {
     return ListTile(
+      onTap: () {
+        actionTaken(PollAction.detail);
+      },
+      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       trailing: const Icon(
         Icons.arrow_forward_ios,
         size: 16,

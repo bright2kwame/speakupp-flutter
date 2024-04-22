@@ -207,6 +207,14 @@ class _ResetPinPageState extends State<ResetPinPage> {
               ),
             ],
           ),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            height: 1,
+            color: Colors.white.withAlpha(100),
+          ),
+          const SizedBox(
+            height: 64,
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -226,7 +234,8 @@ class _ResetPinPageState extends State<ResetPinPage> {
     Map<String, dynamic> data = {
       "phone_number": widget.phoneNumber,
     };
-    var request = ApiRequest(url: "users/resend_otp/", data: data);
+    var request =
+        ApiRequest(url: AppResourses.appStrings.initResetUrl, data: data);
     setState(() {
       _loading = true;
     });
@@ -254,9 +263,10 @@ class _ResetPinPageState extends State<ResetPinPage> {
     Map<String, dynamic> data = {
       "phone_number": widget.phoneNumber,
       "pin": pin,
-      "unique_code": uniqueCode,
+      "code": uniqueCode,
     };
-    var request = ApiRequest(url: "users/validate_account/", data: data);
+    var request =
+        ApiRequest(url: AppResourses.appStrings.confirmResetUrl, data: data);
     setState(() {
       _loading = true;
     });
@@ -272,6 +282,8 @@ class _ResetPinPageState extends State<ResetPinPage> {
   }
 
   Future<void> progressToVerify(DetailItem userItem) async {
+    SimpleToast.showSuccessToast(
+        context, "SpeakUpp", "Pin reset successful, proceed to login");
     Navigator.pop(context);
   }
 }

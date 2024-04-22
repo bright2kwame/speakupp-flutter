@@ -12,6 +12,6 @@ abstract class AuthCall {
   Future<UserItem> updateUser(ApiRequest request);
   Future<DetailItem> uploadFile(ApiRequest request);
   Future<DetailItem> uploadAvatar(ApiRequest request);
-  Future<DetailItem> verifyPhone(ApiRequest request);
+  Future<DetailItem> changePassword(ApiRequest request);
   Future<DetailItem> startPhoneVerification(ApiRequest request);
 }

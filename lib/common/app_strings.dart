@@ -5,6 +5,14 @@ class AppStrings {
     return "https://www.speakupp.com/api/v1.0/";
   }
 
+  String getCoporatePollsUrl(String id) {
+    return "$corporatesUrl$id/get_polls/";
+  }
+
+  String getParameterPaidPollUrl(String id) {
+    return "polls/$id/parameter_voting/";
+  }
+
   String get initResetUrl => "users/reset_password/";
   String get confirmResetUrl => "users/reset_password_confirm/";
   String get completeResetUrl => "users/change_password/";
@@ -23,7 +31,9 @@ class AppStrings {
   String get trendingPolls => "timeline/";
   String get paymentCallback => "https://www.speakupp.com/slydepay_callback/";
   String get partnersUrl => "partners/";
+  String get paidPollUrl => "get_paidpoll_url/";
   String get timelineUrl => "timeline/";
   String get corporatesUrl => "all_new_polls/";
   String get privacyUrl => "https://www.speakupp.com/";
+  String get pollSearchUrl => "new_search_poll/";
 }

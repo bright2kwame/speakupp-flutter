@@ -7,4 +7,5 @@ class AppImages {
   String mainLogo = "${basePath}MainLogo.png";
   String headerLogo = "${basePath}HeaderLogo.png";
   String userAvatar = "${basePath}UserIcon.png";
+  String correctSign = "${basePath}Correct.png";
 }

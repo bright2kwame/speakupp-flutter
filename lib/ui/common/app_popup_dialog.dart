@@ -119,18 +119,15 @@ class AppPopupDialog {
     return pickedDate;
   }
 
-  void presentSingleInputView(
-    BuildContext context,
-    String title,
-    String action, {
-    String? inputHint = "",
-    String? defaultInput = "",
+  void presentPasswordInputView({
     Function(String)? actionTaken,
   }) {
-    TextEditingController editingController = TextEditingController();
-    editingController.text = defaultInput!;
+    TextEditingController pinEditingController = TextEditingController();
+    TextEditingController confirmPinEditingController = TextEditingController();
+
     showModalBottomSheet(
-      context: context,
+      context: buildContext,
+      isScrollControlled: true,
       builder: (BuildContext context) {
         return Container(
           padding: const EdgeInsets.all(16.0),
@@ -141,7 +138,7 @@ class AppPopupDialog {
                 padding:
                     const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                 child: Text(
-                  title,
+                  "Update Profile",
                   style: AppResourses.appTextStyles.textStyle(16),
                 ),
               ),
@@ -150,21 +147,116 @@ class AppPopupDialog {
                 padding:
                     const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                 child: TextField(
-                  controller: editingController,
-                  decoration: AppInputDecorator.outlinedDecoration(inputHint!),
+                  controller: pinEditingController,
+                  maxLength: 4,
+                  decoration: AppInputDecorator.linePasswordInputDecoration(
+                      "4 Digit PIN", () {}, true),
                 ),
               ),
-              const SizedBox(height: 32.0),
+              const SizedBox(height: 16.0),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                child: TextField(
+                  controller: confirmPinEditingController,
+                  maxLength: 4,
+                  decoration: AppInputDecorator.linePasswordInputDecoration(
+                      "Confirm 4 Digit PIN", () {}, true),
+                ),
+              ),
+              const SizedBox(height: 16.0),
               SafeArea(
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
                   child: PrimaryButton(
                       size: Size(SizeConfig(context).screenW! - 64, 50),
-                      text: action,
+                      text: "Change PIN",
                       color: AppResourses.appColors.primaryColor,
                       onClick: () {
-                        actionTaken!(editingController.text.trim());
+                        String pin = pinEditingController.text.trim();
+                        String cPin = confirmPinEditingController.text.trim();
+                        if (pin.isNotEmpty && cPin.isNotEmpty && pin == cPin) {
+                          actionTaken!(pin);
+                        }
+                        Navigator.of(context).pop();
+                      }),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void presentProfileInputView({
+    String? firstName = "",
+    String? lastName = "",
+    Function(String)? actionTaken,
+  }) {
+    TextEditingController firstNameEditingController = TextEditingController();
+    firstNameEditingController.text = firstName ?? "";
+
+    TextEditingController lastNameEditingController = TextEditingController();
+    lastNameEditingController.text = lastName ?? "";
+
+    showModalBottomSheet(
+      context: buildContext,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                child: Text(
+                  "Update Profile",
+                  style: AppResourses.appTextStyles.textStyle(16),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 32),
+                child: TextField(
+                  controller: firstNameEditingController,
+                  decoration:
+                      AppInputDecorator.underlineDecoration(firstName ?? ""),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 32),
+                child: TextField(
+                  controller: lastNameEditingController,
+                  decoration:
+                      AppInputDecorator.underlineDecoration(lastName ?? ""),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              SafeArea(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                  child: PrimaryButton(
+                      size: Size(SizeConfig(context).screenW! - 64, 50),
+                      text: "Save Changes",
+                      color: AppResourses.appColors.primaryColor,
+                      onClick: () {
+                        String firstNameText =
+                            firstNameEditingController.text.trim();
+                        String lastNameText =
+                            lastNameEditingController.text.trim();
+                        String name = "$firstNameText@$lastNameText";
+                        if (firstNameText.isNotEmpty &&
+                            lastNameText.isNotEmpty) {
+                          actionTaken!(name);
+                        }
                         Navigator.of(context).pop();
                       }),
                 ),

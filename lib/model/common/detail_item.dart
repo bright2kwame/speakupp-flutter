@@ -21,7 +21,7 @@ class DetailItem {
 
   static DetailItem fromPaymentJson(dynamic map) {
     var detail = DetailItem(
-      result: map['payment_link'] != null ? map['payment_link'].toString() : "",
+      result: map['redirect_url'] != null ? map['redirect_url'].toString() : "",
     );
     return detail;
   }
