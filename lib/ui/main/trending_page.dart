@@ -6,6 +6,7 @@ import 'package:simple_toast_message/simple_toast.dart';
 import 'package:speakupp/api/api_exception.dart';
 import 'package:speakupp/api/polls/poll_call.dart';
 import 'package:speakupp/common/app_enums.dart';
+import 'package:speakupp/common/app_navigate.dart';
 import 'package:speakupp/common/app_resourses.dart';
 import 'package:speakupp/common/app_utility.dart';
 import 'package:speakupp/model/common/api_request.dart';
@@ -14,6 +15,7 @@ import 'package:speakupp/model/poll/poll_item.dart';
 import 'package:speakupp/model/user/user_item_provider.dart';
 import 'package:speakupp/ui/common/app_input_decorator.dart';
 import 'package:speakupp/ui/common/app_progress_indicator.dart';
+import 'package:speakupp/ui/polls/poll_comment_page.dart';
 import 'package:speakupp/ui/polls/poll_item_view.dart';
 
 class TrendingPage extends StatefulWidget {
@@ -138,13 +140,23 @@ class _TrendingPageState extends State<TrendingPage> {
     } else if (action.action == PollAction.like) {
       _likeUnlikePoll(pollItem, pos);
     } else if (action.action == PollAction.comment) {
+      _startCommentPage(pollItem);
     } else if (action.action == PollAction.vote) {
       if (action.optionItem == null) {
-        _updateVotedPoll(pos);
+        _updateVotedPoll();
       } else {
         _startPollVote(pos, action, pollItem);
       }
     }
+  }
+
+  void _startCommentPage(PollItem poll) {
+    AppNavigate(context).navigateWithPush(PollCommentPage(id: poll.id),
+        callback: (done) {
+      if (done) {
+        _updateVotedPoll();
+      }
+    });
   }
 
   Future<void> _startPollVote(
@@ -157,14 +169,14 @@ class _TrendingPageState extends State<TrendingPage> {
           "device_model": Platform.isIOS ? "Iphone" : "Android"
         }))
         .then((value) {
-      _updateVotedPoll(pos);
+      _updateVotedPoll();
     }).onError((error, stackTrace) {
       SimpleToast.showErrorToast(
           context, "SpeakUpp", (error as ApiException).message);
     });
   }
 
-  void _updateVotedPoll(int pos) {
+  void _updateVotedPoll() {
     Map<String, dynamic> dataParams = {};
     var request = ApiRequest(
         url: AppResourses.appStrings.trendingPolls, data: dataParams);

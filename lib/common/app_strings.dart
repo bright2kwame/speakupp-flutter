@@ -9,6 +9,14 @@ class AppStrings {
     return "$corporatesUrl$id/get_polls/";
   }
 
+  String getPollsCommentUrl(String id) {
+    return "polls/$id/comments/";
+  }
+
+  String getPollCommentUrl(String id) {
+    return "polls/$id/comment/";
+  }
+
   String getParameterPaidPollUrl(String id) {
     return "polls/$id/parameter_voting/";
   }
@@ -17,7 +25,7 @@ class AppStrings {
     return "polls/$id/like/";
   }
 
-   String getVotePollUrl(String id) {
+  String getVotePollUrl(String id) {
     return "polls/$id/vote/";
   }
 

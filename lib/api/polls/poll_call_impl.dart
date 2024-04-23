@@ -6,6 +6,7 @@ import 'package:speakupp/common/app_enums.dart';
 import 'package:speakupp/common/app_utility.dart';
 import 'package:speakupp/model/common/api_request.dart';
 import 'package:speakupp/model/common/detail_item.dart';
+import 'package:speakupp/model/poll/poll_comment_item_result.dart';
 import 'package:speakupp/model/poll/poll_company_item_result.dart';
 import 'package:speakupp/model/poll/poll_item.dart';
 import 'package:speakupp/model/poll/poll_item_result.dart';
@@ -62,6 +63,32 @@ class PollCallImpl extends PollCall {
     try {
       response = await dio.get(request.url, data: request.data);
       return _handleCoporateResult(response);
+    } on DioException catch (e) {
+      throw ApiException(
+          code: e.response?.statusCode ?? 0,
+          message: ReponseDataParser.getJsonKey(e.response?.data, "detail"));
+    }
+  }
+
+  @override
+  Future<PollCommentItemResult> pollComments(ApiRequest request) async {
+    Response response;
+    try {
+      response = await dio.get(request.url, data: request.data);
+      return _handlePollCommentResult(response);
+    } on DioException catch (e) {
+      throw ApiException(
+          code: e.response?.statusCode ?? 0,
+          message: ReponseDataParser.getJsonKey(e.response?.data, "detail"));
+    }
+  }
+
+  @override
+  Future<DetailItem> pollComment(ApiRequest request) async {
+    Response response;
+    try {
+      response = await dio.post(request.url, data: request.data);
+      return _handleMessageResult(response);
     } on DioException catch (e) {
       throw ApiException(
           code: e.response?.statusCode ?? 0,
@@ -157,6 +184,19 @@ class PollCallImpl extends PollCall {
       throw ApiException(
           code: e.response?.statusCode ?? 0,
           message: ReponseDataParser.getJsonKey(e.response?.data, "detail"));
+    }
+  }
+
+  PollCommentItemResult _handlePollCommentResult(Response<dynamic> response) {
+    AppUtility.printLogMessage(response.data, "RESULT");
+    String code = ReponseDataParser.getJsonKey(response.data, "status");
+    if (code == ApiResultStatus.success.name) {
+      return PollCommentItemResult.fromJson(response.data);
+    } else {
+      throw ApiException(
+          code: int.parse(code),
+          message:
+              ReponseDataParser.getJsonKey(response.data, "detail").toString());
     }
   }
 

@@ -10,6 +10,9 @@ class AppInputDecorator {
   static TextStyle helperTextStyle = GoogleFonts.nunito(
       color: Colors.white, fontWeight: FontWeight.normal, fontSize: 16);
 
+  static TextStyle darkHelperTextStyle = GoogleFonts.nunito(
+      color: Colors.black, fontWeight: FontWeight.normal, fontSize: 16);
+
   static EdgeInsets contentPadding = const EdgeInsets.all(12.0);
 
   static InputDecoration underlineDecoration(String hint,
@@ -104,8 +107,10 @@ class AppInputDecorator {
     );
   }
 
-  static InputDecoration searchInputDecoration(
-      String hint, Function actionDone) {
+  static InputDecoration commentInputDecoration(
+    String hint,
+    Function actionDone,
+  ) {
     return InputDecoration(
       contentPadding: contentPadding,
       suffixIcon: ClipRRect(
@@ -115,7 +120,59 @@ class AppInputDecorator {
             actionDone();
           },
           icon: const Icon(
-            Icons.close,
+            Icons.send,
+            size: 30,
+            color: Colors.grey,
+          ),
+        ),
+      ),
+      prefixIcon: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: const Icon(
+          LineIcons.comment,
+          size: 16,
+          color: Colors.grey,
+        ),
+      ),
+      counterText: "",
+      alignLabelWithHint: true,
+      hintStyle: darkHelperTextStyle,
+      labelText: hint,
+      floatingLabelBehavior: FloatingLabelBehavior.never,
+      labelStyle: darkHelperTextStyle,
+      helperStyle: darkHelperTextStyle,
+      enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide(
+        color: Colors.grey,
+        width: 0.5,
+      )),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.grey,
+          width: 0.6,
+        ),
+      ),
+      border: const OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.grey,
+          width: 0.2,
+        ),
+      ),
+    );
+  }
+
+  static InputDecoration searchInputDecoration(String hint, Function actionDone,
+      {IconData? trailingIcon, IconData? leadingIcon}) {
+    return InputDecoration(
+      contentPadding: contentPadding,
+      suffixIcon: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: IconButton(
+          onPressed: () {
+            actionDone();
+          },
+          icon: Icon(
+            trailingIcon ?? Icons.close,
             size: 16,
             color: Colors.white,
           ),
@@ -123,8 +180,8 @@ class AppInputDecorator {
       ),
       prefixIcon: ClipRRect(
         borderRadius: BorderRadius.circular(4),
-        child: const Icon(
-          LineIcons.search,
+        child: Icon(
+          leadingIcon ?? LineIcons.search,
           size: 16,
           color: Colors.white,
         ),
