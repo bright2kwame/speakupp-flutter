@@ -58,6 +58,6 @@ class AppStrings {
   String get paidPollUrl => "get_paidpoll_url/";
   String get timelineUrl => "timeline/";
   String get corporatesUrl => "all_new_polls/";
-  String get privacyUrl => "https://www.speakupp.com/";
+  String get privacyUrl => "https://www.speakupp.com/privacy/";
   String get pollSearchUrl => "new_search_poll/";
 }

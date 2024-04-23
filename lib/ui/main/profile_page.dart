@@ -104,11 +104,11 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           _profileItem("Terms of service", LineIcons.trademark, onTap: () {
             AppUtility.startlaunchUrl(
-                Uri.parse("https://www.speakupp.com/privacy/"));
+                Uri.parse(AppResourses.appStrings.privacyUrl));
           }),
           _profileItem("Privacy policy", LineIcons.userSecret, onTap: () {
             AppUtility.startlaunchUrl(
-                Uri.parse("https://www.speakupp.com/privacy/"));
+                Uri.parse(AppResourses.appStrings.privacyUrl));
           }),
           Container(
             padding: const EdgeInsets.all(16.0),
