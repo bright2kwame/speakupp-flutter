@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:simple_toast_message/simple_toast.dart';
@@ -149,16 +149,12 @@ class _TrendingPageState extends State<TrendingPage> {
 
   Future<void> _startPollVote(
       int pos, PollActionType action, PollItem pollItem) async {
-    final deviceInfoPlugin = DeviceInfoPlugin();
-    final deviceInfo = await deviceInfoPlugin.deviceInfo;
-    final allInfo = deviceInfo.data;
-    AppUtility.printLogMessage(allInfo, "DEVICE");
     pollCall
         .castVote(ApiRequest(
             url: AppResourses.appStrings.getVotePollUrl(pollItem.id),
             data: {
           "choice_id": action.optionItem!.id,
-          "device_model": allInfo["model"]
+          "device_model": Platform.isIOS ? "Iphone" : "Android"
         }))
         .then((value) {
       _updateVotedPoll(pos);
