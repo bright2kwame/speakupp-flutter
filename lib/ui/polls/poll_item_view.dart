@@ -3,6 +3,7 @@ import 'package:line_icons/line_icons.dart';
 import 'package:speakupp/common/app_enums.dart';
 import 'package:speakupp/common/app_navigate.dart';
 import 'package:speakupp/common/app_resourses.dart';
+import 'package:speakupp/model/common/poll_action_type.dart';
 import 'package:speakupp/model/poll/poll_company_item.dart';
 import 'package:speakupp/model/poll/poll_item.dart';
 import 'package:speakupp/model/poll/poll_option_item.dart';
@@ -14,7 +15,7 @@ class PollItemView {
   PollItemView({required this.buildContext});
 
   //MARK: display each poll item
-  Widget single(PollItem item, Function(PollAction) actionTaken) {
+  Widget single(PollItem item, Function(PollActionType) actionTaken) {
     return Container(
       color: Colors.white,
       child: Column(
@@ -78,7 +79,9 @@ class PollItemView {
           item.image.isEmpty
               ? _questionWithNoImage(item)
               : _questionWithImage(item),
-          item.hasVoted! ? _votedPollOption(item) : _unVotedPollOption(item),
+          item.hasVoted!
+              ? _votedPollOption(item)
+              : _unVotedPollOption(item, actionTaken),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
@@ -98,19 +101,21 @@ class PollItemView {
     );
   }
 
-  Widget _unVotedPollOption(PollItem item) {
+  Widget _unVotedPollOption(
+      PollItem item, Function(PollActionType) actionTaken) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: item.pollOptions.isEmpty
           ? Container()
           : item.pollOptions.first.imageUlr!.isEmpty
-              ? _unVotedPollTextOption(item)
-              : _unVotedPollImageOption(item),
+              ? _unVotedPollTextOption(item, actionTaken)
+              : _unVotedPollImageOption(item, actionTaken),
     );
   }
 
 //MARK: option to select to vote for poll with no image
-  Widget _unVotedPollTextOption(PollItem item) {
+  Widget _unVotedPollTextOption(
+      PollItem item, Function(PollActionType) actionTaken) {
     return ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -118,7 +123,7 @@ class PollItemView {
         scrollDirection: Axis.vertical,
         itemBuilder: (BuildContext context, int position) {
           PollOptionItem optionItem = item.pollOptions[position];
-          return _singleUnVotedPollOption(item, optionItem);
+          return _singleUnVotedPollOption(item, optionItem, actionTaken);
         },
         separatorBuilder: (BuildContext context, int position) {
           return const SizedBox(
@@ -128,10 +133,11 @@ class PollItemView {
         itemCount: item.pollOptions.length);
   }
 
-  Widget _singleUnVotedPollOption(PollItem pollItem, PollOptionItem item) {
+  Widget _singleUnVotedPollOption(PollItem pollItem, PollOptionItem item,
+      Function(PollActionType) actionTaken) {
     return GestureDetector(
       onTap: () {
-        _startVotingProcess(pollItem, item);
+        _startVotingProcess(pollItem, item, actionTaken);
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -145,7 +151,9 @@ class PollItemView {
               child: Radio(
                   value: "value",
                   groupValue: "groupValue",
-                  onChanged: (String? check) {}),
+                  onChanged: (String? check) {
+                    _startVotingProcess(pollItem, item, actionTaken);
+                  }),
             ),
             Expanded(
                 child: Padding(
@@ -158,15 +166,26 @@ class PollItemView {
     );
   }
 
-  void _startVotingProcess(PollItem item, PollOptionItem option) {
-    AppNavigate(buildContext).navigateWithPush(BuyVotePage(
-      pollItem: item,
-      pollOptionItem: option,
-    ));
+  Future<void> _startVotingProcess(PollItem item, PollOptionItem option,
+      Function(PollActionType) action) async {
+    if (item.pollType == PollType.PAID_POLL.name) {
+      AppNavigate(buildContext).navigateWithPush(
+          BuyVotePage(
+            pollItem: item,
+            pollOptionItem: option,
+          ), callback: (done) {
+        if (done) {
+          action(PollActionType(action: PollAction.vote));
+        }
+      });
+    } else {
+      action(PollActionType(action: PollAction.vote, optionItem: option));
+    }
   }
 
   //MARK: vote for poll with image
-  Widget _unVotedPollImageOption(PollItem item) {
+  Widget _unVotedPollImageOption(
+      PollItem item, Function(PollActionType) actionTaken) {
     return SizedBox(
       height: 200,
       child: ListView.separated(
@@ -178,7 +197,7 @@ class PollItemView {
             PollOptionItem option = item.pollOptions[position];
             return GestureDetector(
               onTap: () {
-                _startVotingProcess(item, option);
+                _startVotingProcess(item, option, actionTaken);
               },
               child: Container(
                 height: 200,
@@ -398,14 +417,14 @@ class PollItemView {
     );
   }
 
-  Widget _actionAreaView(PollItem item, Function(PollAction) actionTaken) {
+  Widget _actionAreaView(PollItem item, Function(PollActionType) actionTaken) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         TextButton.icon(
             onPressed: () {
-              actionTaken(PollAction.like);
+              actionTaken(PollActionType(action: PollAction.like));
             },
             icon: Icon(
               LineIcons.heart,
@@ -419,7 +438,7 @@ class PollItemView {
             )),
         TextButton.icon(
             onPressed: () {
-              actionTaken(PollAction.comment);
+              actionTaken(PollActionType(action: PollAction.comment));
             },
             icon: Icon(
               LineIcons.comment,
@@ -429,20 +448,17 @@ class PollItemView {
               "${item.noOfComments}",
               style: AppResourses.appTextStyles.textStyle(12),
             )),
-        TextButton.icon(
-            onPressed: () {
-              actionTaken(PollAction.share);
-            },
-            icon: Icon(
-              LineIcons.shareSquareAlt,
-              color: item.isShared!
-                  ? AppResourses.appColors.primaryButtonColor
-                  : AppResourses.appColors.grayColor,
-            ),
-            label: Text(
-              "${item.noOfShares}",
-              style: AppResourses.appTextStyles.textStyle(12),
-            )),
+        IconButton(
+          onPressed: () {
+            actionTaken(PollActionType(action: PollAction.share));
+          },
+          icon: Icon(
+            LineIcons.shareSquareAlt,
+            color: item.isShared!
+                ? AppResourses.appColors.primaryButtonColor
+                : AppResourses.appColors.grayColor,
+          ),
+        ),
       ],
     );
   }

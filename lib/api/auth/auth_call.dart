@@ -9,6 +9,7 @@ abstract class AuthCall {
   Future<DetailItem> resendCode(ApiRequest request);
   Future<DetailItem> initResetPassword(ApiRequest request);
   Future<DetailItem> resetPassword(ApiRequest request);
+  Future<DetailItem> deleteAccount(ApiRequest request);
   Future<UserItem> updateUser(ApiRequest request);
   Future<DetailItem> uploadFile(ApiRequest request);
   Future<DetailItem> uploadAvatar(ApiRequest request);

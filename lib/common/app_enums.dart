@@ -28,6 +28,7 @@ enum TrackType {
 }
 
 enum PollType {
+  POLL("poll"),
   PAID_POLL("paid_poll"),
   MULTIPLE("choices_multiple_rating");
 

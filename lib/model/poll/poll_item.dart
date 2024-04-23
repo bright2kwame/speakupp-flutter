@@ -75,9 +75,9 @@ class PollItem {
 
   // factory method which helps to create instance of same class
   static PollItem fromJson(dynamic map) {
-    (map as Map<String, dynamic>).entries.forEach((item) {
+    for (var item in (map as Map<String, dynamic>).entries) {
       AppUtility.printLogMessage(item, "EACH");
-    });
+    }
 
     return PollItem(
       id: ReponseDataParser.getJsonKey(map, "id").toString(),

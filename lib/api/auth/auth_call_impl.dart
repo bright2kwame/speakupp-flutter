@@ -142,6 +142,17 @@ class AuthCallImpl extends AuthCall {
     }
   }
 
+  @override
+  Future<DetailItem> deleteAccount(ApiRequest request) async {
+    Response response;
+    try {
+      response = await dio.post(request.url, data: request.data);
+      return _handleMessageResult(response);
+    } on DioException catch (e) {
+      throw _handleException(e);
+    }
+  }
+
   DetailItem _handleMessageResult(Response<dynamic> response) {
     AppUtility.printLogMessage(response.data, "RESULT");
     String code = ReponseDataParser.getJsonKey(response.data, "status");

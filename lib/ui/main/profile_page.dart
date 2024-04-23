@@ -69,12 +69,15 @@ class _ProfilePageState extends State<ProfilePage> {
           _profileItem("Personal information", LineIcons.userAlt, onTap: () {
             _gotoProfilePage();
           }),
-          _profileItem("Change PIN", LineIcons.userSecret, onTap: () {
+          _profileItem("Change PIN", LineIcons.cog, onTap: () {
             _gotoPinChangePage();
           }),
           _profileItem("Share SpeakUpp", LineIcons.shareSquare, onTap: () {
             AppUtility.startSharingContent(
                 "I use SpeakUpp to cast vote and rate things. Join me here: https://www.speakupp.com/");
+          }),
+          _profileItem("Remove SpeakUpp Account", LineIcons.recycle, onTap: () {
+            _deleteAccount();
           }),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -98,8 +101,14 @@ class _ProfilePageState extends State<ProfilePage> {
               style: AppResourses.appTextStyles.textStyle(20),
             ),
           ),
-          _profileItem("Terms of service", LineIcons.trademark),
-          _profileItem("Privacy policy", LineIcons.userSecret),
+          _profileItem("Terms of service", LineIcons.trademark, onTap: () {
+            AppUtility.startlaunchUrl(
+                Uri.parse("https://www.speakupp.com/privacy/"));
+          }),
+          _profileItem("Privacy policy", LineIcons.userSecret, onTap: () {
+            AppUtility.startlaunchUrl(
+                Uri.parse("https://www.speakupp.com/privacy/"));
+          }),
           Container(
             padding: const EdgeInsets.all(16.0),
             width: double.infinity,
@@ -117,16 +126,20 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   //logout out of acccount
+  void _deleteAccount() {
+    AppPopupDialog(buildContext: context).presentDailog(
+        "SpeakUpp Digital Services will suspend the remove your account from our system. This means you will not be able to cast vote for your favourite candidates anymore.",
+        title: "Delete SpeakUpp Account", onCompleted: () {
+      _deleteAccountRequst();
+    });
+  }
+
+  //logout out of acccount
   void _logoutAccount() {
     AppPopupDialog(buildContext: context).presentDailog(
         "You may have to provide your phone number and pin next time you return to login into SpeakUpp.",
         title: "Log out of SpeakUpp", onCompleted: () {
-      preferenceModule.saveUserData("");
-      userItemProvider.deleteAll().then((value) {
-        AppNavigate(context).navigateAndDismissAll(const SplashScreenPage(
-          users: [],
-        ));
-      });
+      _clearAndNavigateHome();
     });
   }
 
@@ -181,6 +194,33 @@ class _ProfilePageState extends State<ProfilePage> {
       _changePassword(ApiRequest(
           url: AppResourses.appStrings.completeResetUrl,
           data: {"phone_number": userItem?.phoneNumber, "password": result}));
+    });
+  }
+
+  void _deleteAccountRequst() {
+    ApiRequest request = ApiRequest(
+        url: AppResourses.appStrings.getDeleteUserUrl(userItem!.id), data: {});
+    setState(() {
+      _loading = true;
+    });
+    authCall.deleteAccount(request).whenComplete(() {
+      setState(() {
+        _loading = false;
+      });
+    }).then((value) {
+      _clearAndNavigateHome();
+    }).onError((error, stackTrace) {
+      SimpleToast.showErrorToast(
+          context, "SpeakUpp", (error as ApiException).message);
+    });
+  }
+
+  void _clearAndNavigateHome() {
+    preferenceModule.saveUserData("");
+    userItemProvider.deleteAll().then((value) {
+      AppNavigate(context).navigateAndDismissAll(const SplashScreenPage(
+        users: [],
+      ));
     });
   }
 

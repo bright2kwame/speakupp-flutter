@@ -10,8 +10,8 @@ import 'package:speakupp/common/app_utility.dart';
 import 'package:speakupp/model/common/api_request.dart';
 import 'package:speakupp/model/poll/poll_item.dart';
 import 'package:speakupp/model/poll/poll_option_item.dart';
+import 'package:speakupp/ui/common/app_fullscreen_progree_view.dart';
 import 'package:speakupp/ui/common/app_input_decorator.dart';
-import 'package:speakupp/ui/common/app_progress_indicator.dart';
 import 'package:speakupp/ui/common/custom_app_bar.dart';
 import 'package:speakupp/ui/common/primary_button.dart';
 import 'package:speakupp/ui/common/size_config.dart';
@@ -113,7 +113,8 @@ class _BuyVotePageState extends State<BuyVotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _mainView(),
+      body:
+          _loading ? const AppFullscreenProgressView(message: "") : _mainView(),
       appBar: CustomAppBar.subBar(
           leadingAction: () {
             Navigator.of(context).pop();
@@ -131,8 +132,6 @@ class _BuyVotePageState extends State<BuyVotePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AppProgressIndicator().inderminateProgress(_loading,
-              color: AppResourses.appColors.primaryColor),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
