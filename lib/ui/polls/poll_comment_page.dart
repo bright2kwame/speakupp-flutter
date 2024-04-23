@@ -129,7 +129,7 @@ class _PollCommentPageState extends State<PollCommentPage> {
   Widget _commentViewSection() {
     return SafeArea(
         child: Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: TextFormField(
         autocorrect: true,
         controller: _commentController,
@@ -137,7 +137,7 @@ class _PollCommentPageState extends State<PollCommentPage> {
         style:
             AppResourses.appTextStyles.textStyle(16, fontColor: Colors.black),
         decoration:
-            AppInputDecorator.commentInputDecoration("Say Something...", () {
+            AppInputDecorator.commentInputDecoration("Say Something ...", () {
           _makeComment();
         }),
       ),

@@ -76,7 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
             AppUtility.startSharingContent(
                 "I use SpeakUpp to cast vote and rate things. Join me here: https://www.speakupp.com/");
           }),
-          _profileItem("Remove SpeakUpp Account", LineIcons.recycle, onTap: () {
+          _profileItem("Remove SpeakUpp Account", LineIcons.removeUser,
+              onTap: () {
             _deleteAccount();
           }),
           Padding(
@@ -125,10 +126,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  //logout out of acccount
+  //delete the account
   void _deleteAccount() {
     AppPopupDialog(buildContext: context).presentDailog(
-        "SpeakUpp Digital Services will suspend the remove your account from our system. This means you will not be able to cast vote for your favourite candidates anymore.",
+        "SpeakUpp Digital Services will suspend and remove your account from our system. This means you will not be able to cast vote for your favourite candidates anymore.",
         title: "Delete SpeakUpp Account", onCompleted: () {
       _deleteAccountRequst();
     });
@@ -147,6 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Column(
       children: [
         ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
           onTap: () {
             onTap != null ? onTap() : null;
           },
@@ -263,6 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _profileView() {
     return ListTile(
+      contentPadding: const EdgeInsets.all(12),
       onTap: _gotoProfilePage,
       leading: ClipOval(
         child: Container(

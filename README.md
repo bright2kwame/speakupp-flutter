@@ -1,6 +1,6 @@
 # speakupp
 
-A new Flutter project.
+SpeakUpp application allows individuals to cast votes on trending national issues.
 
 ## Getting Started
 

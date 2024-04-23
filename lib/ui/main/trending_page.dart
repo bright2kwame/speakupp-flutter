@@ -32,6 +32,7 @@ class _TrendingPageState extends State<TrendingPage> {
       GetIt.instance.get<UserItemProvider>();
   List<PollItem> items = [];
   String nextUrl = "";
+  List<String> loadedPages = [];
   Timer? _searchTimer;
   final TextEditingController _searchController = TextEditingController();
 
@@ -120,6 +121,9 @@ class _TrendingPageState extends State<TrendingPage> {
         primary: false,
         scrollDirection: Axis.vertical,
         itemBuilder: (BuildContext context, int position) {
+          if (position == items.length - 5 && !loadedPages.contains(nextUrl)) {
+            _fetchData(ApiRequest(url: nextUrl, data: {}), false);
+          }
           PollItem pollItem = items[position];
           return PollItemView(buildContext: context).single(pollItem,
               (PollActionType action) {
@@ -221,6 +225,7 @@ class _TrendingPageState extends State<TrendingPage> {
   }
 
   void _fetchData(ApiRequest request, bool clear) {
+    loadedPages.add(request.url);
     setState(() {
       _loading = true;
     });
