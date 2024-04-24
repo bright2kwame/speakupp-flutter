@@ -225,6 +225,9 @@ class _TrendingPageState extends State<TrendingPage> {
   }
 
   void _fetchData(ApiRequest request, bool clear) {
+    if (loadedPages.contains(request.url) || request.url.isEmpty) {
+      return;
+    }
     loadedPages.add(request.url);
     setState(() {
       _loading = true;
