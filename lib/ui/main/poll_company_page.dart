@@ -25,6 +25,7 @@ class _PollCompanyPageState extends State<PollCompanyPage> {
       GetIt.instance.get<UserItemProvider>();
   List<PollCompanyItem> items = [];
   String nextUrl = "";
+  List<String> loadedPages = [];
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _PollCompanyPageState extends State<PollCompanyPage> {
     Map<String, dynamic> dataParams = {};
     var request = ApiRequest(
         url: AppResourses.appStrings.corporatesUrl, data: dataParams);
-    _fetchData(request);
+    _fetchData(request, true);
   }
 
   @override
@@ -65,6 +66,9 @@ class _PollCompanyPageState extends State<PollCompanyPage> {
         primary: false,
         scrollDirection: Axis.vertical,
         itemBuilder: (BuildContext context, int position) {
+          if (position == items.length - 5 && !loadedPages.contains(nextUrl)) {
+            _fetchData(ApiRequest(url: nextUrl, data: {}), false);
+          }
           PollCompanyItem pollItem = items[position];
           return PollItemView(buildContext: context).coporate(pollItem,
               (PollAction action) {
@@ -82,7 +86,11 @@ class _PollCompanyPageState extends State<PollCompanyPage> {
         itemCount: items.length);
   }
 
-  void _fetchData(ApiRequest request) {
+  void _fetchData(ApiRequest request, bool clear) {
+    if (loadedPages.contains(request.url) || request.url.isEmpty) {
+      return;
+    }
+    loadedPages.add(request.url);
     setState(() {
       _loading = true;
     });
@@ -91,6 +99,9 @@ class _PollCompanyPageState extends State<PollCompanyPage> {
         _loading = false;
       });
     }).then((value) {
+      if (clear) {
+        items.clear();
+      }
       setState(() {
         items.addAll(value.items);
         nextUrl = value.nextUrl ?? "";

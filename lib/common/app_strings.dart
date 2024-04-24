@@ -37,6 +37,7 @@ class AppStrings {
     return "users/$id/delete_account/";
   }
 
+  String get verifyAccountUrl => "users/validate_account/";
   String get initResetUrl => "users/reset_password/";
   String get confirmResetUrl => "users/reset_password_confirm/";
   String get completeResetUrl => "users/change_password/";

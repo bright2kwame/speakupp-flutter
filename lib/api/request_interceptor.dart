@@ -11,9 +11,6 @@ class RequestInterceptor extends Interceptor {
     String userData = pref.getUserData();
     if (userData.isNotEmpty) {
       options.headers["Authorization"] = "Token $userData";
-    } else {
-      options.headers["Authorization"] =
-          "Token 729cb6d0db88b80a270dac27bff0f598d3b53d18";
     }
     return super.onRequest(options, handler);
   }

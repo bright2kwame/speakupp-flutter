@@ -337,7 +337,7 @@ class _SignUpScreenPageState extends State<SignUpScreenPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: PrimaryOutlineButton(
                 size: Size(SizeConfig(context).screenW! - 32, 50),
-                text: "Sing Up",
+                text: "Sign Up",
                 onClick: _startSignUp),
           ),
           const SizedBox(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:simple_toast_message/simple_toast.dart';
 import 'package:speakupp/common/app_enums.dart';
 import 'package:speakupp/common/app_navigate.dart';
 import 'package:speakupp/common/app_resourses.dart';
@@ -168,6 +169,11 @@ class PollItemView {
 
   Future<void> _startVotingProcess(PollItem item, PollOptionItem option,
       Function(PollActionType) action) async {
+    if (item.hasExpired!) {
+      SimpleToast.showErrorToast(
+          buildContext, "SpeakUpp", "The poll has expired");
+      return;
+    }
     if (item.pollType == PollType.PAID_POLL.name) {
       AppNavigate(buildContext).navigateWithPush(
           BuyVotePage(
@@ -393,7 +399,7 @@ class PollItemView {
                 child: Text(
                   item.question,
                   style: AppResourses.appTextStyles
-                      .textStyle(24, fontColor: Colors.white),
+                      .textStyle(18, fontColor: Colors.white),
                 ),
               ))
         ],
@@ -410,7 +416,7 @@ class PollItemView {
         children: [
           Text(
             item.question,
-            style: AppResourses.appTextStyles.textStyle(24),
+            style: AppResourses.appTextStyles.textStyle(18),
           )
         ],
       ),

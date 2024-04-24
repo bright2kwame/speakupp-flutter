@@ -30,6 +30,7 @@ class _CorporateDetailPageState extends State<CorporateDetailPage> {
   final PollCall pollCall = GetIt.instance.get<PollCall>();
   List<PollItem> items = [];
   String nextUrl = "";
+  List<String> loadedPages = [];
 
   @override
   void initState() {
@@ -46,6 +47,10 @@ class _CorporateDetailPageState extends State<CorporateDetailPage> {
   }
 
   void _fetchData(ApiRequest request, bool clear) {
+    if (loadedPages.contains(request.url) || request.url.isEmpty) {
+      return;
+    }
+    loadedPages.add(request.url);
     setState(() {
       _loading = true;
     });
@@ -100,6 +105,9 @@ class _CorporateDetailPageState extends State<CorporateDetailPage> {
         primary: false,
         scrollDirection: Axis.vertical,
         itemBuilder: (BuildContext context, int position) {
+          if (position == items.length - 5 && !loadedPages.contains(nextUrl)) {
+            _fetchData(ApiRequest(url: nextUrl, data: {}), false);
+          }
           PollItem pollItem = items[position];
           return PollItemView(buildContext: context).single(pollItem,
               (PollActionType action) {
@@ -159,6 +167,7 @@ class _CorporateDetailPageState extends State<CorporateDetailPage> {
   }
 
   void _updateVotedPoll() {
+    loadedPages.clear();
     Map<String, dynamic> dataParams = {};
     var request = ApiRequest(
         url: AppResourses.appStrings.trendingPolls, data: dataParams);

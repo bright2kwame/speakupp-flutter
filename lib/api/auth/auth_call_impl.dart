@@ -41,6 +41,7 @@ class AuthCallImpl extends AuthCall {
   Future<UserItem> verifyAccount(ApiRequest request) async {
     Response response;
     try {
+      //dio.options.headers = {"":""};
       response = await dio.post(request.url, data: request.data);
       return _handleUserResult(response);
     } on DioException catch (e) {

@@ -14,6 +14,7 @@ import 'package:speakupp/ui/common/app_popup_dialog.dart';
 import 'package:speakupp/ui/common/custom_app_bar.dart';
 import 'package:speakupp/ui/common/primary_outline.dart';
 import 'package:speakupp/ui/common/size_config.dart';
+import 'package:speakupp/ui/main/home_tab_page.dart';
 
 class CodeVerificationPage extends StatefulWidget {
   final String phoneNumber;
@@ -191,7 +192,8 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
       "phone_number": widget.phoneNumber,
       "unique_code": code,
     };
-    var request = ApiRequest(url: "users/validate_account/", data: data);
+    var request =
+        ApiRequest(url: AppResourses.appStrings.verifyAccountUrl, data: data);
     setState(() {
       _loading = true;
     });
@@ -210,6 +212,6 @@ class _CodeVerificationPageState extends State<CodeVerificationPage> {
     await userItemProvider.insert(userItem);
     preferenceModule.saveUserData(userItem.authToken!);
     // ignore: use_build_context_synchronously
-    AppNavigate(context).navigateAndDismissAll(Container());
+    AppNavigate(context).navigateAndDismissAll(const HomeTabPage());
   }
 }

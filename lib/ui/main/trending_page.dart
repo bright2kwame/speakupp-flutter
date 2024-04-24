@@ -181,6 +181,7 @@ class _TrendingPageState extends State<TrendingPage> {
   }
 
   void _updateVotedPoll() {
+    loadedPages.clear();
     Map<String, dynamic> dataParams = {};
     var request = ApiRequest(
         url: AppResourses.appStrings.trendingPolls, data: dataParams);
